@@ -10,7 +10,13 @@ app.use(express.json());
 app.use(express.static('public'));
 
 
-const notes = [];
+const notes = [
+    {
+        title: "tester",
+        text: "tester",
+        id: "tester"
+    }
+];
 
 
 //HTML routes
@@ -20,6 +26,13 @@ app.get("/", (req, res) => {
 
 
 app.get("/notes", (req, res) => {
+    let savedNotesArr = [];
+    fs.readFileSync(path.join(__dirname, "db", "db.json"), (err, res) => {
+        if (err) {console.log("ERROR, could not read file.")
+        } else {
+            console.log(res);
+        }
+    });
     res.sendFile(path.join(__dirname, "public", "notes.html"))
 });
 
@@ -29,9 +42,16 @@ app.get("/api/notes", (req, res) => {
     return res.json(notes);
 })
 
+// req = {
+//  url: , 
+//  data: {title: ,text: }, 
+//  method:"post"
+//  }
+    
 app.post("/api/notes", (req, res) => {
-    let newNote = req.body;
-    newNote.id = req.title.replace(/\s+/g, "").toLowerCase();
+    let newNote = req.data;
+    console.log(req.data);
+    newNote.id = req.data.title.replace(/\s+/g, "").toLowerCase();
     notes.push(newNote);
     res.json(newNote);
 })
@@ -53,8 +73,4 @@ app.listen(PORT, () => {
     console.log("App listening on PORT " + PORT);
   });
 
-
-// function getNotes() {
-//     fs.readFileSync("./Develop/db/db.json");
-// }
 
