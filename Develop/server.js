@@ -28,10 +28,8 @@ app.get("/", (req, res) => {
 app.get("/notes", (req, res) => {
     let savedNotesArr = [];
     fs.readFileSync(path.join(__dirname, "db", "db.json"), (err, res) => {
-        if (err) {console.log("ERROR, could not read file.")
-        } else {
+        if (err) throw err;
             console.log(res);
-        }
     });
     res.sendFile(path.join(__dirname, "public", "notes.html"))
 });
@@ -39,19 +37,15 @@ app.get("/notes", (req, res) => {
 // API routes
 
 app.get("/api/notes", (req, res) => {
+    getNotes();
     return res.json(notes);
 })
-
-// req = {
-//  url: , 
-//  data: {title: ,text: }, 
-//  method:"post"
-//  }
     
 app.post("/api/notes", (req, res) => {
-    let newNote = req.data;
-    console.log(req.data);
-    newNote.id = req.data.title.replace(/\s+/g, "").toLowerCase();
+    let newNote = req.body;
+    newNote.id = newNote.title.replace(/\s+/g, "").toLowerCase();
+    console.log(newNote);
+    appendNote(newNote);
     notes.push(newNote);
     res.json(newNote);
 })
@@ -74,3 +68,17 @@ app.listen(PORT, () => {
   });
 
 
+function getNotes() {
+    fs.readFileSync(path.join(__dirname, "db", "db.json"), (err, res) => {
+        if (err) throw err; 
+            console.log("Append successful!");
+    })
+};
+
+function appendNote(note) {
+    fs.appendFileSync(path.join(__dirname, "db", "db.json"), '\n' + JSON.stringify(note), (err, res) => {
+        if (err) throw err;
+        console.log("Appended successfully!");
+        return res.json(note);
+    })
+};
