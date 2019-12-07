@@ -61,4 +61,3 @@ typings/
 .next
 
 # json package after install
-.package-lock.json
